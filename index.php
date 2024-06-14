@@ -5,29 +5,29 @@ include "connect.php";
 // Initialize variables
 $message = "";
 
+// Validation function
+function validateForm($task, $start_time, $end_time)
+{
+    $errorMessages = [];
+
+    if (empty($task)) {
+        $errorMessages[] = "Please fill in your task.";
+    }
+    if (empty($start_time)) {
+        $errorMessages[] = "Please fill in your Start time.";
+    }
+    if (empty($end_time)) {
+        $errorMessages[] = "Please fill in your End time.";
+    }
+
+    return $errorMessages;
+}
+
 // Insertion of new task
 if (isset($_POST["create"])) {
     $task = $_POST["task"];
     $start_time = $_POST["start_time"];
     $end_time = $_POST["end_time"];
-
-    // Validation function
-    function validateForm($task, $start_time, $end_time)
-    {
-        $errorMessages = [];
-
-        if (empty($task)) {
-            $errorMessages[] = "Please fill in your task.";
-        }
-        if (empty($start_time)) {
-            $errorMessages[] = "Please fill in your Start time.";
-        }
-        if (empty($end_time)) {
-            $errorMessages[] = "Please fill in your End time.";
-        }
-
-        return $errorMessages;
-    }
 
     // Perform validation
     $validationErrors = validateForm($task, $start_time, $end_time);
@@ -57,12 +57,17 @@ if (isset($_POST["create"])) {
 if (isset($_POST["delete"])) {
     $deleteIds = $_POST["deleteIds"];
     if (!empty($deleteIds)) {
-        foreach ($deleteIds as $id) {
-            // Delete task from database
-            $sql = "DELETE FROM work WHERE task_no = '$id'";
-            mysqli_query($conn, $sql);
+        $uniqueIds = array_unique($deleteIds); // Remove duplicates 
+        if (count($uniqueIds) !== count($deleteIds)) {
+            $message = "Duplicate tasks selected for deletion.";
+        } else {
+            foreach ($deleteIds as $id) {
+                // Delete task from database
+                $sql = "DELETE FROM work WHERE task_no = '$id'";
+                mysqli_query($conn, $sql);
+            }
+            $message = "Selected tasks deleted successfully";
         }
-        $message = "Selected tasks deleted successfully";
     } else {
         // If no checkboxes are checked, refresh the page
         header("Location: ".$_SERVER['PHP_SELF']);
@@ -74,8 +79,8 @@ if (isset($_POST["delete"])) {
 $sql = "SELECT * FROM work";
 // Perform the query
 $result = mysqli_query($conn, $sql);
-?>
 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -88,7 +93,6 @@ $result = mysqli_query($conn, $sql);
     <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css"> <!-- Reference to the external CSS file -->
     <style>
-
         body {
             background-color: #ffffff; /* Set background color to white */
         }
@@ -117,8 +121,8 @@ $result = mysqli_query($conn, $sql);
     <div class="form-bg">
         <div class="container mt-5">
             <div class="form-container">
-            <h1>To-Do List</h1>
-                <form method="post" onsubmit="return validateForm()">
+                <h1>To-Do List</h1>
+                <form method="post">
                     <div class="mb-3">
                         <label for="task" class="form-label">Task</label>
                         <select id="task" name="task" class="form-select">
@@ -146,13 +150,14 @@ $result = mysqli_query($conn, $sql);
                         <input type="time" name="end_time" id="end_time" class="form-control">
                     </div>
 
-                    <button type="submit" name="create" class="btn btn-primary">Add Task</button>
-                    <div id="error-container" class="mt-3"></div>
-
-                    <?php if (!empty($message)): ?>
-                        <p style="color: green;"><?php echo $message; ?></p>
-                    <?php endif; ?>
+                    <button type="submit" name="create" class="btn btn-primary">Add Task</button><button onclick="window.location.reload();" class="btn btn-secondary mt-3">Refresh</button>
+                    <div id="error-container" class="mt-3">
+                        <?php if (!empty($message)): ?>
+                            <p style="color: green;"><?php echo $message; ?></p>
+                        <?php endif; ?>
+                    </div>
                 </form>
+                
 
                 <h2 class="mt-5">Task List</h2>
                 <form method="post" id="deleteForm">
@@ -169,8 +174,7 @@ $result = mysqli_query($conn, $sql);
                         <tbody>
                             <?php
                             $i = 1;
-                            while ($row = mysqli_fetch_assoc($result)) :
-                            ?>
+                            while ($row = mysqli_fetch_assoc($result)): ?>
                                 <tr>
                                     <td><?php echo $i++; ?></td>
                                     <td><?php echo $row["task"]; ?></td>
@@ -183,44 +187,11 @@ $result = mysqli_query($conn, $sql);
                     </table>
                     <button type="submit" name="delete" class="btn btn-danger">Delete Selected</button>
                 </form>
-                <?php echo $message; ?>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        function validateForm() {
-            var task = document.getElementById('task').value;
-            var start_time = document.getElementById('start_time').value;
-            var end_time = document.getElementById('end_time').value;
-            var errorMessages = [];
-
-            if (task.trim() === '') {
-                errorMessages.push('Please fill in your task.');
-            }
-            if (start_time.trim() === '') {
-                errorMessages.push('Please fill in your Start time.');
-            }
-            if (end_time.trim() === '') {
-                errorMessages.push('Please fill in your End time.');
-            }
-
-            if (errorMessages.length > 0) {
-                // Display error messages
-                var errorContainer = document.getElementById('error-container');
-                errorContainer.innerHTML = ''; // Clear previous messages
-                errorMessages.forEach(function (message) {
-                    var p = document.createElement('p');
-                    p.textContent = message;
-                    errorContainer.appendChild(p);
-                });
-                return false; // Prevent form submission
-            }
-            return true; // Proceed with form submission
-        }
-    </script>
 </body>
 
 </html>
