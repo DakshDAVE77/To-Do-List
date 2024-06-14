@@ -76,6 +76,7 @@ $sql = "SELECT * FROM work";
 $result = mysqli_query($conn, $sql);
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -83,124 +84,143 @@ $result = mysqli_query($conn, $sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> <!-- Reference to the external CSS file -->
+    <style>
+
+        body {
+            background-color: #ffffff; /* Set background color to white */
+        }
+        .form-bg {
+            max-width:980px;
+            width:100%;
+        }
+        h1, h2 {
+            font-family: 'Zen Dots';
+            color: black;
+            text-align: center;
+        }
+        .form-container {
+            background-color: #ffffff; /* Set background color to white */
+            padding:20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
 </head>
 
 <body>
-    <style>
-        h1 {
-            font-family: 'Zen Dots';
-            color: white;
-            text-align: center;
-        }
-    </style>
-    <form method="post" onsubmit="return validateForm()">
-        <h1> To-Do List </h1>
-            <label for="task"></label>
-            <select id="task" name="task">
-                <option value="Wake-Up">Wake-Up</option>
-                <option value="Gym">Gym</option>
-                <option value="Breakfest">Breakfast</option>
-                <option value="Heading Office">Heading Office</option>
-                <option value="Intership(Office)">Internship(Office)</option>
-                <option value="Lunch">Lunch</option>
-                <option value="High Tea">High Tea</option>
-                <option value="Heading Home">Heading Home</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Evening Walk">Evening Walk</option>
-                <option value="Sleep">Sleep</option>
-            </select><br><br>
+    <div class="form-bg">
+        <div class="container mt-5">
+            <div class="form-container">
+            <h1>To-Do List</h1>
+                <form method="post" onsubmit="return validateForm()">
+                    <div class="mb-3">
+                        <label for="task" class="form-label">Task</label>
+                        <select id="task" name="task" class="form-select">
+                            <option value="Wake-Up">Wake-Up</option>
+                            <option value="Gym">Gym</option>
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="Heading Office">Heading Office</option>
+                            <option value="Internship(Office)">Internship(Office)</option>
+                            <option value="Lunch">Lunch</option>
+                            <option value="High Tea">High Tea</option>
+                            <option value="Heading Home">Heading Home</option>
+                            <option value="Dinner">Dinner</option>
+                            <option value="Evening Walk">Evening Walk</option>
+                            <option value="Sleep">Sleep</option>
+                        </select>
+                    </div>
 
+                    <div class="mb-3">
+                        <label for="start_time" class="form-label">Start Time</label>
+                        <input type="time" name="start_time" id="start_time" class="form-control" color="black">
+                    </div>
 
-        <input type="time" name="start_time" id="start_time" placeholder="Start Time" style="color: black;"><span style="color: white;"> Start Time</span>.<br><br>
+                    <div class="mb-3">
+                        <label for="end_time" class="form-label">End Time</label>
+                        <input type="time" name="end_time" id="end_time" class="form-control">
+                    </div>
 
-        <input type="time" name="end_time" id="end_time" placeholder="Enter end time" style="color: black;"><span style="color: white;">  End Time</span>.<br><br>
-        <button type="submit" name="create" class="btn btn-primary">Add Task</button>
-        <div id="error-container" style="color: white;"></div>
+                    <button type="submit" name="create" class="btn btn-primary">Add Task</button>
+                    <div id="error-container" class="mt-3"></div>
 
-        <?php if (!empty($message)): ?>
-            <p style="color: green;"><?php echo $message; ?></p>
-        <?php endif; ?>
-    </form>
+                    <?php if (!empty($message)): ?>
+                        <p style="color: green;"><?php echo $message; ?></p>
+                    <?php endif; ?>
+                </form>
 
-    <div>
-        <h2>Task List</h2>
-        <style>
-            h2 {
-                font-family: 'Zen Dots';
-                color: white;
-                text-align: center;
-            }
-        </style>
-
-        <form method="post" id="deleteForm">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Task</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $i = 1;
-                    while ($row = mysqli_fetch_assoc($result)) :
-                    ?>
-                        <tr>
-                            <td><?php echo $i++; ?></td>
-                            <td><?php echo $row["task"]; ?></td>
-                            <td><?php echo $row["start_time"]; ?></td>
-                            <td><?php echo $row["end_time"]; ?></td>
-                            <td><input type="checkbox" name="deleteIds[]" value="<?php echo $row["task_no"]; ?>"></td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-            <button type="submit" name="delete" class="btn btn-danger">Delete Selected</button>
-        </form>
-        <?php echo $message; ?>
+                <h2 class="mt-5">Task List</h2>
+                <form method="post" id="deleteForm">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Task</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $i = 1;
+                            while ($row = mysqli_fetch_assoc($result)) :
+                            ?>
+                                <tr>
+                                    <td><?php echo $i++; ?></td>
+                                    <td><?php echo $row["task"]; ?></td>
+                                    <td><?php echo $row["start_time"]; ?></td>
+                                    <td><?php echo $row["end_time"]; ?></td>
+                                    <td><input type="checkbox" name="deleteIds[]" value="<?php echo $row["task_no"]; ?>"></td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                    <button type="submit" name="delete" class="btn btn-danger">Delete Selected</button>
+                </form>
+                <?php echo $message; ?>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-    function validateForm() {
-        var task = document.getElementById('task').value;
-        var start_time = document.getElementById('start_time').value;
-        var end_time = document.getElementById('end_time').value;
-        var errorMessages = [];
+        function validateForm() {
+            var task = document.getElementById('task').value;
+            var start_time = document.getElementById('start_time').value;
+            var end_time = document.getElementById('end_time').value;
+            var errorMessages = [];
 
-        if (task.trim() === '') {
-            errorMessages.push('Please fill in your task.');
-        }
-        if (start_time.trim() === '') {
-            errorMessages.push('Please fill in your Start time.');
-        }
-        if (end_time.trim() === '') {
-            errorMessages.push('Please fill in your End time.');
-        }
+            if (task.trim() === '') {
+                errorMessages.push('Please fill in your task.');
+            }
+            if (start_time.trim() === '') {
+                errorMessages.push('Please fill in your Start time.');
+            }
+            if (end_time.trim() === '') {
+                errorMessages.push('Please fill in your End time.');
+            }
 
-        if (errorMessages.length > 0) {
-            // Display error messages
-            var errorContainer = document.getElementById('error-container');
-            errorContainer.innerHTML = ''; // Clear previous messages
-            errorMessages.forEach(function (message) {
-                var p = document.createElement('p');
-                p.textContent = message;
-                errorContainer.appendChild(p);
-            });
-            return false; // Prevent form submission
+            if (errorMessages.length > 0) {
+                // Display error messages
+                var errorContainer = document.getElementById('error-container');
+                errorContainer.innerHTML = ''; // Clear previous messages
+                errorMessages.forEach(function (message) {
+                    var p = document.createElement('p');
+                    p.textContent = message;
+                    errorContainer.appendChild(p);
+                });
+                return false; // Prevent form submission
+            }
+            return true; // Proceed with form submission
         }
-        return true; // Proceed with form submission
-    }
+    </script>
+</body>
 
-    // Remove selected option from dropdown after selection
-    document.getElementById('task').addEventListener('change', function () {
-        // No need to remove the selected option
-    });
-</script>
+</html>
