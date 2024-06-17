@@ -136,7 +136,6 @@ if (isset($_POST["delete_single"])) {
 }
 
 // Edit task
-// Edit task
 if (isset($_POST["edit_single"])) {
     $task_no = $_POST["edit_single"];
     $start_time = $_POST["start_time_edit"];
